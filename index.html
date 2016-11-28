@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conway.js</title>
+    <link rel="icon" href="favicon.ico" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="js/fileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Bungee|Ubuntu" rel="stylesheet">
+    <link rel="stylesheet" href="css/conway.css" />
+    <script src="js/keys.js"></script>
+    <style>
+      /*Onboard Style*/
+    </style>
+  </head>
+  <body class="un">
+    <canvas id="canvas" width="600" height="500"></canvas>
+    <div id="container">
+      <h1>conway<sub style="font-size:25px;">js</sub></h1>
+      <hr><br>
+      <div style="text-align: center;">
+        <form><b>Controls / General Settings</b></form><br>
+        <button id="playButton" style="margin: 3px;" onclick="update(this)">▶</button>
+        <button id="pauseButton" style="margin: 3px;" onclick="update(this)">❚❚</button>
+        <button id="stepButton" style="margin: 3px;" onclick="update(this)">step</button>
+        <button id="rewindButton" style="margin: 3px;" onclick="update(this)">rewind</button>
+      </div>
+      <br>
+      <form>
+        fps <input id="fpsInput" type="number" value="30" step="1" min="0" max="60" onchange="update(this)"/><br><br>
+        rewind<sup style="color:red;font-size:8px;">BETA</sup> <input id="rewindToggle" type="checkbox" onchange="update(this)"/><br>
+        autoplay <input id="stepToggle" type="checkbox" checked="true" onchange="update(this)"/><br>
+        keyboard controls <input id="keyControls" type="checkbox" checked="true" onchange="update(this)"/><br>
+        glowing edges <input id="glowToggle" type="checkbox" onchange="update(this)"/><br>
+        grayscale <input id="grayscaleToggle" type="checkbox" onchange="update(this)"/><br>
+        show world name <input id="worldNameToggle" type="checkbox" onchange="update(this)"/><br>
+      </form>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Dipslay Settings</b></div><br>
+        background color <input id="backgroundCol" class="splotch" value="#000000" type="color" onchange="update(this)"/><br><br>
+        color set <input id="color1" class="colortile" style="margin-left: 5px;" type="color" value="#FF0000" onchange="update(this)"/>
+        <input id="color2" class="colortile" type="color" value="#FFA500" onchange="update(this)"/>
+        <input id="color3" class="colortile" type="color" value="#FFFF00" onchange="update(this)"/><br>
+        <input id="color4" class="colortile" type="color" value="#008000" onchange="update(this)"/>
+        <input id="color5" class="colortile" type="color" value="#0000FF" onchange="update(this)"/>
+        <input id="color6" class="colortile" type="color" value="#800080" onchange="update(this)"/><br><br>
+        glow radius <input id="glowRadius" type="number" value="25" step="0.5" min="5" max="80" onchange="update(this)"/><br><br>
+        fuzz (<i>bit division</i>) <input id="blur" type="number" value="1" step="0.5" min="0.5" max="50" onchange="update(this)"/>
+      </form>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>World Generator</b></div><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInput" type="number" value="4" step="0.5" min="0.5" max="20" onchange="update(this)"/><br><br>
+        seed percentage<sup style="color:red;">*</sup> <input id="seedInput" type="number" value="50" step="0.5" min="0.5" max="99.5" onchange="update(this)"/><br><br>
+        starting generation <input id="startGenInput" type="number" value="0" step="1" min="0" max="50" onchange="update(this)"/><br><br>
+        world name <input id="nameInput" type="text" placeholder="Untitled 1" maxlength="50" onchange="update(this)"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="newWorld" onclick="update(this)">generate world</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Custom Object</b></div><br>
+        grid size<sup style="color:red;">*</sup> <input id="gridInput" type="number" value="7" step="1" min="2" max="20" onchange="update(this)"/><br><br>
+        paint color <input id="paintCol" class="splotch" type="color" value="#FF0000" onchange="update(this)"/><br><br>
+        <div id="gridContainer"></div><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom" type="number" value="12" step="0.5" min="0.5" max="20" onchange="update(this)"/><br><br>
+        starting generation <input id="startGenInputCustom" type="number" value="0" step="1" min="0" max="50" onchange="update(this)"/><br><br>
+        being name <input id="nameInputCustom" type="text" placeholder="Untitled 1" maxlength="50" onchange="update(this)"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="newBeing" onclick="update(this)">create object</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Export</b></div><br>
+        current generation <input id="currentToggle" type="checkbox" onchange="update(this)" checked/><br><br>
+        file name<sup style="color:red;">*</sup> <input id="fileNameInput" type="text" placeholder="Untitled 0" maxlength="50" onchange="update(this)"/><br><br>
+        .conwayjs <input id="conwayjsFileType" type="radio" name="fileSelect" onchange="update(this)" checked/><br>
+        .txt <input id="txtFileType" type="radio" name="fileSelect" onchange="update(this)"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="exportButton" onclick="update(this)">export world</button>
+      </div>
+      <br><hr><br>
+      <form style="text-align:center;">
+        <b>Import</b><br><br>
+        <input id="fileImport" type="file" onchange="update(this)"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="importButton" onclick="update(this)">load world</button>
+      </div>
+      <br><hr><br>
+      <form style="color:gray;text-align:center;font-size:12px;">
+        <span>Made by <a href="https://github.com/jackmandelkorn" target="_blank" style="color:#505050;">Jack Mandelkorn</a>.</span><br><br>
+        <span>More at the <a href="http://www.conwaylife.com/wiki/Main_Page" target="_blank" style="color:#505050;">Wiki</a>.</span><br><br>
+      </form>
+    </div>
+    <span id="version">v1.2.4</span>
+    <div id="readout"></div>
+    <div id="worldName">Untitled 0</div>
+    <script src="js/conway.js"></script>
+  </body>
+</html>
