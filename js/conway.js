@@ -2,7 +2,7 @@
 //Made originally by Jack Mandelkorn
 //Email: jacman444@gmail.com
 
-var version = "1.2.4";
+var version = "1.2.5";
 document.getElementById("version").innerHTML = "v" + version;
 
 Array.prototype.max = function(){
@@ -53,9 +53,8 @@ var scaleInt = (scale / blur);
 var dimX = Math.floor(canvas.width / scaleInt);
 var dimY = Math.floor(canvas.height / scaleInt);
 
-var maxPop = 3;
-var minPop = 2;
-var reproductionPoint = 3;
+var lifeRules = [3];
+var surviveRules = [2,3];
 
 var fps = 30;
 var stepMode = true;
@@ -71,8 +70,18 @@ var background = "black";
 var softness = 0;
 var grayscale = false;
 
+var presets = ["B36/S125","2x2","B34/S34","34 Life","B357/S1358","Amoeba","B0123478/S01234678","AntiLife","B345/S4567","Assimilation","B34/S456","Bacteria","B345/S2","Blinkers","B3567/S15678","Bugs","B378/S235678","Coagulations","B3/S23","Conway's Life","B3/S45678","Coral","B3/S124","Corrosion of Conformity","B3678/S34678","Day & Night","B35678/S5678","Diamoeba","B3/S023","DotLife","B3/S238","EightLife","B45/S12345","Electrified Maze","B3/S12","Flock","B1357/S02468","Fredkin","B3457/S4568","Gems","B1/S1","Gnarl","B1/S012345678","H-trees","B36/S23","HighLife","B35678/S4678","Holstein","B38/S238","HoneyLife","B25678/S5678","Iceballs","B012345678/S34678","InverseLife","B35/S234578","Land Rush","B3/S012345678","Life without death","B2/S0","Live Free or Die","B345/S5","Long Life","B368/S238","LowDeath","B3/S13","LowLife","B3/S12345","Maze","B37/S12345","Maze with Mice","B3/S1234","Mazectric","B37/S1234","Mazectric with Mice","B368/S245","Move","B38/S23","Pedestrian Life","B378/S012345678","Plow World","B1357/S1357","Replicator","B2/S","Seeds","B234/S Serviettes","B367/S125678","Slow","Blob","B3/S1237","SnowLife","B3678/S235678","Stains","B5678/S45678","Vote","B4678/S35678","Vote 4/5","B45678/S2345","Walled cities"];
+
 //var lifeForm = shapes[0];
 var lifeForm = false;
+
+for (a = 0; a < presets.length; a+=2) {
+  var parent = document.getElementById("presetSelect");
+  var element = document.createElement("option");
+  element.innerHTML = presets[a + 1];
+  element.value = presets[a];
+  parent.appendChild(element);
+}
 
 for (i = 0; i < (dimX * dimY); i++) {
   grid.push(0);
@@ -201,22 +210,38 @@ function step() {
   var testArray = [];
   for (i = 0; i < (dimX * dimY); i++) {
     testArray.push(grid[i]);
-    if (grid[i] === 0 && getNeighbors(i).length === 3) {
-      if (inversion) {
-        testArray[i] = 0;
+    if (grid[i] === 0) {
+      var truth = false;
+      for (var c = 0; c < lifeRules.length; c++) {
+        if (getNeighbors(i).length === lifeRules[c]) {
+          truth = true;
+        }
       }
-      else {
-        testArray[i] = 1;
-        colors[i] = getBirthColor(getNeighbors(i));
+      if (truth) {
+        if (inversion) {
+          testArray[i] = 0;
+        }
+        else {
+          testArray[i] = 1;
+          colors[i] = getBirthColor(getNeighbors(i));
+        }
       }
     }
-    else if (grid[i] === 1 && (getNeighbors(i).length > maxPop || getNeighbors(i).length < minPop)) {
-      if (inversion) {
-        testArray[i] = 1;
-        colors[i] = getBirthColor(getNeighbors(i));
+    else {
+      var truth = true;
+      for (var c = 0; c < surviveRules.length; c++) {
+        if (getNeighbors(i).length === surviveRules[c]) {
+          truth = false;
+        }
       }
-      else {
-        testArray[i] = 0;
+      if (truth) {
+        if (inversion) {
+          testArray[i] = 1;
+          colors[i] = getBirthColor(getNeighbors(i));
+        }
+        else {
+          testArray[i] = 0;
+        }
       }
     }
   }
@@ -626,10 +651,10 @@ function update(obj) {
   else if (obj.id === "exportButton") {
     var temp;
     if (document.getElementById("currentToggle").checked) {
-      temp = JSON.stringify([grid,colors,colorSet,canvas.width,canvas.height,dimX,dimY,scale,scaleInt]);
+      temp = JSON.stringify([grid,colors,colorSet,canvas.width,canvas.height,lifeRules,surviveRules,dimX,dimY,scale,scaleInt]);
     }
     else {
-      temp = JSON.stringify([initGrid,initColors,colorSet,canvas.width,canvas.height,dimX,dimY,scale,scaleInt]);
+      temp = JSON.stringify([initGrid,initColors,colorSet,canvas.width,canvas.height,lifeRules,surviveRules,dimX,dimY,scale,scaleInt]);
     }
     console.log(initColors);
     if (document.getElementById("fileNameInput").value === "") {
@@ -644,6 +669,22 @@ function update(obj) {
   }
   else if (obj.id === "importButton") {
     importWorld();
+  }
+  else if (obj.id === "editRule" && document.getElementById("ruleInput").value) {
+    if (document.getElementById("warningToggle").checked) {
+      if (confirm("Editing the rulestring can cause damage to your world. Are you sure you want to continue?")) {
+        replaceRules(document.getElementById("ruleInput").value);
+      }
+    }
+    else {
+      replaceRules(document.getElementById("ruleInput").value);
+    }
+  }
+  else if (obj.id === "presetSelect") {
+    document.getElementById("ruleInput").value = obj.value;
+  }
+  else if (obj.id === "worldName") {
+    obj.innerHTML = prompt("Change world name:",obj.innerHTML);
   }
 }
 
@@ -731,16 +772,18 @@ function importWorld() {
       clearInterval(blob);
       paused = true;
     }
-    currentName = file[9];
+    currentName = file[11];
     generations = 0;
     lifeForm = false;
     grid = file[0];
     colors = file[1];
     colorSet = file[2];
-    scale = file[7];
-    scaleInt = file[8];
-    dimX = file[5];
-    dimY = file[6];
+    scale = file[9];
+    scaleInt = file[10];
+    lifeRules = file[5];
+    surviveRules = file[6];
+    dimX = file[7];
+    dimY = file[8];
     if (canvas.width !== file[3] || canvas.height !== file[4]) {
       alert("The dimensions of the current canvas differ from the dimensions of the world you are attempting to load. Rendering the world might result in distortion.");
     }
@@ -783,4 +826,25 @@ function newBlob() {
     }
     paused = false;
   }
+}
+
+function replaceRules(rstring) {
+  var testB = [];
+  var testS = [];
+  var truth = true;
+  for (var i = 1; i < rstring.length; i++) {
+    if (rstring.charAt(i) === "/") {
+      truth = false;
+    }
+    else if (rstring.charAt(i) !== "S") {
+      if (truth) {
+        testB.push(JSON.parse(rstring.charAt(i)));
+      }
+      else {
+        testS.push(JSON.parse(rstring.charAt(i)));
+      }
+    }
+  }
+  lifeRules = testB;
+  surviveRules = testS;
 }
