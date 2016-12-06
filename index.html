@@ -64,7 +64,7 @@
         grid size<sup style="color:red;">*</sup> <input id="gridInput" type="number" value="7" step="1" min="2" max="20" onchange="update(this)"/><br><br>
         paint color <input id="paintCol" class="splotch" type="color" value="#FF0000" onchange="update(this)"/><br><br>
         <div id="gridContainer"></div><br>
-        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom" type="number" value="12" step="0.5" min="0.5" max="20" onchange="update(this)"/><br><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom" type="number" value="4" step="0.5" min="0.5" max="20" onchange="update(this)"/><br><br>
         starting generation <input id="startGenInputCustom" type="number" value="0" step="1" min="0" max="50" onchange="update(this)"/><br><br>
         being name <input id="nameInputCustom" type="text" placeholder="Untitled 1" maxlength="50" onchange="update(this)"/><br><br>
       </form>
@@ -91,6 +91,18 @@
         <button id="importButton" onclick="update(this)">load world</button>
       </div>
       <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Game Rules</b></div><br>
+        presets <select id="presetSelect" onchange="update(this)">
+          <option value="">--</option>
+        </select><br><br>
+        rulestring <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" onchange="update(this)" spellcheck="false"/><br><br>
+        warning <input id="warningToggle" type="checkbox" checked/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="editRule" onclick="update(this)">update rules</button>
+      </div>
+      <br><hr><br>
       <form style="color:gray;text-align:center;font-size:12px;">
         <span>Made by <a href="https://github.com/jackmandelkorn" target="_blank" style="color:#505050;">Jack Mandelkorn</a>.</span><br><br>
         <span>More at the <a href="http://www.conwaylife.com/wiki/Main_Page" target="_blank" style="color:#505050;">Wiki</a>.</span><br><br>
@@ -98,7 +110,7 @@
     </div>
     <span id="version">v1.2.4</span>
     <div id="readout"></div>
-    <div id="worldName">Untitled 0</div>
+    <div id="worldName" onclick="update(this)">Untitled 0</div>
     <script src="js/conway.js"></script>
   </body>
 </html>
