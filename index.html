@@ -72,6 +72,18 @@
         <button id="newBeing" onclick="update(this)">create object</button>
       </div>
       <br><hr><br>
+      <form style="text-align:center;">
+        <b>Upload Image</b><br><br>
+        <input id="imageUpload" type="file" onchange="update(this)"/><br><br>
+        render height<sup style="color:red;">*</sup> <input id="renderHeight" type="number" value="100" step="1" min="5" onchange="update(this)"/><br><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom2" type="number" value="4" step="0.5" min="0.5" max="20" onchange="update(this)"/><br><br>
+        sensitivity <input id="lightSensitivity" type="number" value="60" step="1" min="1" min="99" onchange="update(this)"/><br><br>
+        invert <input id="colorInversionToggle" type="checkbox" onchange="update(this)"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="imageButton" onclick="update(this)">render image</button>
+      </div>
+      <br><hr><br>
       <form>
         <div style="text-align:center;"><b>Export</b></div><br>
         current generation <input id="currentToggle" type="checkbox" onchange="update(this)" checked/><br><br>
