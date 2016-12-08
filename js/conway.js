@@ -2,7 +2,7 @@
 //Made originally by Jack Mandelkorn
 //Email: jacman444@gmail.com
 
-var version = "1.2.5";
+var version = "1.2.7";
 document.getElementById("version").innerHTML = "v" + version;
 
 Array.prototype.max = function(){
@@ -22,6 +22,15 @@ window.onkeydown = function(e) {
 
 $(document).ready(function(){
     $(this).scrollTop(0);
+});
+
+onKey(65,function(){
+  if (document.getElementById("stepToggle").checked) {
+    document.getElementById("stepToggle").checked = false;
+  }
+  else {
+    document.getElementById("stepToggle").checked = true;
+  }
 });
 
 var file;
@@ -64,9 +73,9 @@ var instability = false;
 var initSteps = 3;
 var saveTip = 1000;
 
-var colorSet = ["red","orange","yellow","green","blue","purple"];
-var birthColor = "black";
-var background = "black";
+var colorSet = ["#FF0000","#FFA500","#FFFF00","#008000","#0000FF","#800080"];
+var birthColor = "#000000";
+var background = "#000000";
 var softness = 0;
 var grayscale = false;
 
@@ -686,6 +695,14 @@ function update(obj) {
   else if (obj.id === "worldName") {
     obj.innerHTML = prompt("Change world name:",obj.innerHTML);
   }
+  else if (obj.id === "imageButton") {
+    var dataFeed = document.getElementById("imageUpload");
+    if (dataFeed.files && dataFeed.files[0]) {
+      var reader = new FileReader();
+      reader.onload = imageLoad;
+      reader.readAsDataURL(dataFeed.files[0]);
+    }
+  }
 }
 
 function replaceColor(c1,c2) {
@@ -836,7 +853,7 @@ function replaceRules(rstring) {
     if (rstring.charAt(i) === "/") {
       truth = false;
     }
-    else if (rstring.charAt(i) !== "S") {
+    else if (rstring.charAt(i) !== "S" && rstring.charAt(i) !== "s") {
       if (truth) {
         testB.push(JSON.parse(rstring.charAt(i)));
       }
@@ -847,4 +864,121 @@ function replaceRules(rstring) {
   }
   lifeRules = testB;
   surviveRules = testS;
+}
+
+
+
+function getImagePixels(image) {
+  var ret1 = [];
+  var ret2 = [];
+  var testCanvas = document.createElement("CANVAS");
+  var sensitivity = document.getElementById("lightSensitivity").value;
+  testCanvas.width = image.width;
+  testCanvas.height = image.height;
+  testCanvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+  for (y = 0; y < (Math.floor(image.height)); y++) {
+    for (x = 0; x < image.width; x++) {
+      var pixelData = testCanvas.getContext('2d').getImageData(x, (y * 1), 1, 1).data;
+      ret1.push(lifeFill(pixelData[0],pixelData[1],pixelData[2],sensitivity));
+			ret2.push(roundColor(pixelData[0],pixelData[1],pixelData[2],true));
+    }
+  }
+  return [ret1,ret2];
+}
+
+function roundColor(r,g,b,hexed) {
+  var rgbSet = [];
+  var testSet = [];
+  for (var i = 0; i < colorSet.length; i++) {
+    rgbSet.push(hexify(colorSet[i]));
+    testSet.push(0);
+  }
+  for (var i = 0; i < testSet.length; i++) {
+    testSet[i] = testSet[i] + Math.abs(rgbSet[i].r - r);
+    testSet[i] = testSet[i] + Math.abs(rgbSet[i].g - g);
+    testSet[i] = testSet[i] + Math.abs(rgbSet[i].b - b);
+  }
+  var ret = testSet.indexOf(testSet.min());
+  if (hexed) {
+    return colorSet[ret];
+  }
+  else {
+    return ("rgb(" + rgbSet[ret].r + "," + rgbSet[ret].g + "," + rgbSet[ret].b + ")");
+  }
+}
+
+function lifeFill(r,g,b,sens) {
+  var tempInvert = document.getElementById("colorInversionToggle").checked;
+  if ((r+g+b) > Math.floor(765 * (sens / 100))) {
+    if (tempInvert) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  if (tempInvert) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+function hexify(hex) {
+  if (hex.charAt(0) === "#") {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+  }
+  else {
+    return hex;
+  }
+}
+
+function imageLoad(e) {
+  var image = new Image();
+  image.src = e.target.result;
+    var naturalHeight = image.height;
+    var naturalWidth = image.width;
+    var imgScale = JSON.parse(document.getElementById("renderHeight").value);
+  image.height = imgScale;
+  image.width = Math.floor((imgScale * naturalWidth) / naturalHeight);
+  var testSet = getImagePixels(image);
+
+  if (paused === false) {
+    clearInterval(blob);
+    paused = true;
+  }
+
+  scale = document.getElementById("scaleInputCustom2").value;
+  scaleInt = (scale / blur);
+  dimX = Math.floor(canvas.width / scaleInt);
+  dimY = Math.floor(canvas.height / scaleInt);
+
+  var ig = grid.length;
+  grid = [];
+  colors = [];
+  for (var i = 0; i < ig; i++) {
+    grid.push(0);
+    colors.push(birthColor);
+  }
+  var offX = Math.floor((dimX / 2) - (JSON.parse(image.width) / 2));
+  var offY = Math.floor((dimY / 2) - (JSON.parse(image.height) / 2));
+  for (var y = 0; y < image.height; y++) {
+    for (var x = 0; x < image.width; x++) {
+      var posNumber = (((offY + y) * dimX) + offX + x);
+      grid[posNumber] = testSet[0][(y * image.width) + x];
+      colors[posNumber] = testSet[1][(y * image.width) + x];
+    }
+  }
+  arraySave = [];
+  initGrid = grid;
+  initColors = colors;
+  generations = 0;
+  render();
+  newBlob();
 }
