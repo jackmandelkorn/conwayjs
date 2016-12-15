@@ -24,6 +24,10 @@ $(document).ready(function(){
     $(this).scrollTop(0);
 });
 
+$("input[type=checkbox]").click(function(){
+  $("input[type=checkbox]").blur();
+});
+
 onKey(65,function(){
   if (document.getElementById("stepToggle").checked) {
     document.getElementById("stepToggle").checked = false;
@@ -31,6 +35,7 @@ onKey(65,function(){
   else {
     document.getElementById("stepToggle").checked = true;
   }
+  update(document.getElementById("stepToggle"));
 });
 
 var file;
@@ -72,6 +77,7 @@ var slip = true;
 var instability = false;
 var initSteps = 3;
 var saveTip = 1000;
+var rounding = false;
 
 var colorSet = ["#FF0000","#FFA500","#FFFF00","#008000","#0000FF","#800080"];
 var birthColor = "#000000";
@@ -79,7 +85,7 @@ var background = "#000000";
 var softness = 0;
 var grayscale = false;
 
-var presets = ["B36/S125","2x2","B34/S34","34 Life","B357/S1358","Amoeba","B0123478/S01234678","AntiLife","B345/S4567","Assimilation","B34/S456","Bacteria","B345/S2","Blinkers","B3567/S15678","Bugs","B378/S235678","Coagulations","B3/S23","Conway's Life","B3/S45678","Coral","B3/S124","Corrosion of Conformity","B3678/S34678","Day & Night","B35678/S5678","Diamoeba","B3/S023","DotLife","B3/S238","EightLife","B45/S12345","Electrified Maze","B3/S12","Flock","B1357/S02468","Fredkin","B3457/S4568","Gems","B1/S1","Gnarl","B1/S012345678","H-trees","B36/S23","HighLife","B35678/S4678","Holstein","B38/S238","HoneyLife","B25678/S5678","Iceballs","B012345678/S34678","InverseLife","B35/S234578","Land Rush","B3/S012345678","Life without death","B2/S0","Live Free or Die","B345/S5","Long Life","B368/S238","LowDeath","B3/S13","LowLife","B3/S12345","Maze","B37/S12345","Maze with Mice","B3/S1234","Mazectric","B37/S1234","Mazectric with Mice","B368/S245","Move","B38/S23","Pedestrian Life","B378/S012345678","Plow World","B1357/S1357","Replicator","B2/S","Seeds","B234/S","Serviettes","B367/S125678","Slow Blob","B3/S1237","SnowLife","B3678/S235678","Stains","B5678/S45678","Vote","B4678/S35678","Vote 4/5","B45678/S2345","Walled cities"];
+var presets = ["B36/S125","2x2","B34/S34","34 Life","B357/S1358","Amoeba","B0123478/S01234678","AntiLife","B345/S4567","Assimilation","B34/S456","Bacteria","B345/S2","Blinkers","B3567/S15678","Bugs","B378/S235678","Coagulations","B3/S23","Conway's Life","B3/S45678","Coral","B3/S124","Corrosion of Conformity","B3678/S34678","Day & Night","B35678/S5678","Diamoeba","B3/S023","DotLife","B3/S238","EightLife","B45/S12345","Electrified Maze","B318254/S48","Fiery Islands","B3/S12","Flock","B1357/S02468","Fredkin","B3457/S4568","Gems","B1/S1","Gnarl","B1/S012345678","H-trees","B36/S23","HighLife","B35678/S4678","Holstein","B38/S238","HoneyLife","B25678/S5678","Iceballs","B012345678/S34678","InverseLife","B35/S234578","Land Rush","B3/S012345678","Life without death","B2/S0","Live Free or Die","B345/S5","Long Life","B368/S238","LowDeath","B3/S13","LowLife","B3/S12345","Maze","B37/S12345","Maze with Mice","B3/S1234","Mazectric","B37/S1234","Mazectric with Mice","B368/S245","Move","B43218/S48","Old English","B35712/S8","Palms","B63514278/S3","Pastures","B38/S23","Pedestrian Life","B378/S012345678","Plow World","B1357/S1357","Replicator","B123478/S167","Royal","B2/S","Seeds","B234/S","Serviettes","B367/S125678","Slow Blob","B3/S1237","SnowLife","B3678/S235678","Stains","B71/S1458726","Triangle Infinity","B5678/S45678","Vote","B4678/S35678","Vote 4/5","B45678/S2345","Walled cities","B84237156/S3182","Zelda"];
 
 //var lifeForm = shapes[0];
 var lifeForm = false;
@@ -183,6 +189,22 @@ onKey(16, function(){
   }
 });
 
+onKey(82, function(){
+  if (controls) {
+    grid = initGrid;
+    colors = initColors;
+    generations = 0;
+    arraySave = [];
+    render();
+  }
+});
+
+onKey(78, function(){
+  if (controls) {
+    update(document.getElementById("randRule"));
+  }
+});
+
 render();
 
 initGrid = grid;
@@ -219,37 +241,39 @@ function step() {
   var testArray = [];
   for (i = 0; i < (dimX * dimY); i++) {
     testArray.push(grid[i]);
-    if (grid[i] === 0) {
-      var truth = false;
-      for (var c = 0; c < lifeRules.length; c++) {
-        if (getNeighbors(i).length === lifeRules[c]) {
-          truth = true;
+    if (getNeighbors(i).length > 0 || grid[i] !== 0) {
+      if (grid[i] === 0) {
+        var truth = false;
+        for (var c = 0; c < lifeRules.length; c++) {
+          if (getNeighbors(i).length === lifeRules[c]) {
+            truth = true;
+          }
+        }
+        if (truth) {
+          if (inversion) {
+            testArray[i] = 0;
+          }
+          else {
+            testArray[i] = 1;
+            colors[i] = getBirthColor(getNeighbors(i));
+          }
         }
       }
-      if (truth) {
-        if (inversion) {
-          testArray[i] = 0;
+      else {
+        var truth = true;
+        for (var c = 0; c < surviveRules.length; c++) {
+          if (getNeighbors(i).length === surviveRules[c]) {
+            truth = false;
+          }
         }
-        else {
-          testArray[i] = 1;
-          colors[i] = getBirthColor(getNeighbors(i));
-        }
-      }
-    }
-    else {
-      var truth = true;
-      for (var c = 0; c < surviveRules.length; c++) {
-        if (getNeighbors(i).length === surviveRules[c]) {
-          truth = false;
-        }
-      }
-      if (truth) {
-        if (inversion) {
-          testArray[i] = 1;
-          colors[i] = getBirthColor(getNeighbors(i));
-        }
-        else {
-          testArray[i] = 0;
+        if (truth) {
+          if (inversion) {
+            testArray[i] = 1;
+            colors[i] = getBirthColor(getNeighbors(i));
+          }
+          else {
+            testArray[i] = 0;
+          }
         }
       }
     }
@@ -352,7 +376,12 @@ function putImage(x,y,color) {
     ctx.shadowColor = color;
     ctx.fillStyle = color;
   }
-  ctx.fillRect(x,y,entwidth,entheight);
+  if (rounding) {
+    ctx.fillRect(Math.floor(x),Math.floor(y),Math.floor(entwidth),Math.floor(entheight));
+  }
+  else {
+    ctx.fillRect(x,y,entwidth,entheight);
+  }
 }
 
 function generateBeing(x,y) {
@@ -680,17 +709,13 @@ function update(obj) {
     importWorld();
   }
   else if (obj.id === "editRule" && document.getElementById("ruleInput").value) {
-    if (document.getElementById("warningToggle").checked) {
-      if (confirm("Editing the rulestring can cause damage to your world. Are you sure you want to continue?")) {
-        replaceRules(document.getElementById("ruleInput").value);
-      }
-    }
-    else {
-      replaceRules(document.getElementById("ruleInput").value);
-    }
+    replaceRules(document.getElementById("ruleInput").value);
   }
   else if (obj.id === "presetSelect") {
     document.getElementById("ruleInput").value = obj.value;
+    if (document.getElementById("warningToggle").checked) {
+      replaceRules(document.getElementById("ruleInput").value);
+    }
   }
   else if (obj.id === "worldName") {
     obj.innerHTML = prompt("Change world name:",obj.innerHTML);
@@ -701,6 +726,12 @@ function update(obj) {
       var reader = new FileReader();
       reader.onload = imageLoad;
       reader.readAsDataURL(dataFeed.files[0]);
+    }
+  }
+  else if (obj.id === "randRule") {
+    document.getElementById("ruleInput").value = randomRule();
+    if (document.getElementById("warningToggle").checked) {
+      replaceRules(document.getElementById("ruleInput").value);
     }
   }
 }
@@ -879,7 +910,7 @@ function getImagePixels(image) {
   for (y = 0; y < (Math.floor(image.height)); y++) {
     for (x = 0; x < image.width; x++) {
       var pixelData = testCanvas.getContext('2d').getImageData(x, (y * 1), 1, 1).data;
-      ret1.push(lifeFill(pixelData[0],pixelData[1],pixelData[2],sensitivity));
+      ret1.push(lifeFill(pixelData[0],pixelData[1],pixelData[2],pixelData[3],sensitivity));
 			ret2.push(roundColor(pixelData[0],pixelData[1],pixelData[2],true));
     }
   }
@@ -907,9 +938,9 @@ function roundColor(r,g,b,hexed) {
   }
 }
 
-function lifeFill(r,g,b,sens) {
+function lifeFill(r,g,b,a,sens) {
   var tempInvert = document.getElementById("colorInversionToggle").checked;
-  if ((r+g+b) > Math.floor(765 * (sens / 100))) {
+  if (((r+g+b) * (a/255)) > Math.floor(765 * (sens / 100))) {
     if (tempInvert) {
       return 0;
     }
@@ -981,4 +1012,24 @@ function imageLoad(e) {
   generations = 0;
   render();
   newBlob();
+}
+
+function randomRule() {
+  var chars = ["1","2","3","4","5","6","7","8"];
+  var bNum = Math.floor(Math.random() * 8) + 1;
+  var sNum = Math.floor(Math.random() * 8) + 1;
+  var ret = "B";
+  for (var i = 0; i < bNum; i++) {
+    var test = Math.floor(Math.random() * chars.length);
+    ret = ret + chars[test];
+    chars.splice(test,1);
+  }
+  chars = ["1","2","3","4","5","6","7","8"];
+  ret = ret + "/S";
+  for (var i = 0; i < sNum; i++) {
+    var test = Math.floor(Math.random() * chars.length);
+    ret = ret + chars[test];
+    chars.splice(test,1);
+  }
+  return ret;
 }

@@ -118,6 +118,12 @@ input[type=color].splotch {
   cursor: pointer;
 }
 
+button.mini {
+  height: 15px;
+  font-size: 10px;
+}
+
+
 #readout {
   position: fixed;
   text-align: center;

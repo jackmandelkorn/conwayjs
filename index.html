@@ -108,9 +108,9 @@
         presets <select id="presetSelect" onchange="update(this)">
           <option value="">--</option>
         </select><br><br>
-        rulestring <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" onchange="update(this)" spellcheck="false"/><br><br>
-        warning <input id="warningToggle" type="checkbox" checked/><br><br>
-      </form>
+        rulestring <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" onchange="update(this)" spellcheck="false"/><br>
+      </form><button id="randRule" class="mini" onclick="update(this)">random rule</button><br><br>
+        auto-update <input id="warningToggle" type="checkbox"/><br><br>
       <div style="text-align:center;">
         <button id="editRule" onclick="update(this)">update rules</button>
       </div>
