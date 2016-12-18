@@ -199,3 +199,7 @@ button.mini {
   font-size: 10px;
   cursor: default;
 }
+
+audio {
+  display: none;
+}

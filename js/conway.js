@@ -2,7 +2,7 @@
 //Made originally by Jack Mandelkorn
 //Email: jacman444@gmail.com
 
-var version = "1.2.7";
+var version = "1.3.2";
 document.getElementById("version").innerHTML = "v" + version;
 
 Array.prototype.max = function(){
@@ -38,6 +38,7 @@ onKey(65,function(){
   update(document.getElementById("stepToggle"));
 });
 
+var music;
 var file;
 var blob;
 var controls = true;
@@ -52,6 +53,7 @@ var paused = false;
 var rewind = false;
 var worldnumber = 1;
 var currentName = "Untitled 0";
+var showColorComp = false;
 
 var blur = 1;
 
@@ -85,7 +87,7 @@ var background = "#000000";
 var softness = 0;
 var grayscale = false;
 
-var presets = ["B36/S125","2x2","B34/S34","34 Life","B357/S1358","Amoeba","B0123478/S01234678","AntiLife","B345/S4567","Assimilation","B34/S456","Bacteria","B345/S2","Blinkers","B3567/S15678","Bugs","B378/S235678","Coagulations","B3/S23","Conway's Life","B3/S45678","Coral","B3/S124","Corrosion of Conformity","B3678/S34678","Day & Night","B35678/S5678","Diamoeba","B3/S023","DotLife","B3/S238","EightLife","B45/S12345","Electrified Maze","B318254/S48","Fiery Islands","B3/S12","Flock","B1357/S02468","Fredkin","B3457/S4568","Gems","B1/S1","Gnarl","B1/S012345678","H-trees","B36/S23","HighLife","B35678/S4678","Holstein","B38/S238","HoneyLife","B25678/S5678","Iceballs","B012345678/S34678","InverseLife","B35/S234578","Land Rush","B3/S012345678","Life without death","B2/S0","Live Free or Die","B345/S5","Long Life","B368/S238","LowDeath","B3/S13","LowLife","B3/S12345","Maze","B37/S12345","Maze with Mice","B3/S1234","Mazectric","B37/S1234","Mazectric with Mice","B368/S245","Move","B43218/S48","Old English","B35712/S8","Palms","B63514278/S3","Pastures","B38/S23","Pedestrian Life","B378/S012345678","Plow World","B1357/S1357","Replicator","B123478/S167","Royal","B2/S","Seeds","B234/S","Serviettes","B367/S125678","Slow Blob","B3/S1237","SnowLife","B3678/S235678","Stains","B71/S1458726","Triangle Infinity","B5678/S45678","Vote","B4678/S35678","Vote 4/5","B45678/S2345","Walled cities","B84237156/S3182","Zelda"];
+var presets = ["B36/S125","2x2","B34/S34","34 Life","B357/S1358","Amoeba","B0123478/S01234678","AntiLife","B345/S4567","Assimilation","B34/S456","Bacteria","B345/S2","Blinkers","B3567/S15678","Bugs","B378/S235678","Coagulations","B3/S23","Conway's Life","B3/S45678","Coral","B3/S124","Corrosion of Conformity","B3678/S34678","Day & Night","B35678/S5678","Diamoeba","B3/S023","DotLife","B3/S238","EightLife","B45/S12345","Electrified Maze","B318254/S48","Fiery Islands","B3/S12","Flock","B1357/S02468","Fredkin","B3457/S4568","Gems","B1/S1","Gnarl","B1/S012345678","H-trees","B36/S23","HighLife","B35678/S4678","Holstein","B38/S238","HoneyLife","B25678/S5678","Iceballs","B012345678/S34678","InverseLife","B35/S234578","Land Rush","B3/S012345678","Life without death","B2/S0","Live Free or Die","B345/S5","Long Life","B368/S238","LowDeath","B3/S13","LowLife","B3/S12345","Maze","B37/S12345","Maze with Mice","B3/S1234","Mazectric","B37/S1234","Mazectric with Mice","B368/S245","Move","B43218/S48","Old English","B35712/S8","Palms","B63514278/S3","Pastures","B38/S23","Pedestrian Life","B83751462/S45","Peru","B378/S012345678","Plow World","B1357/S1357","Replicator","B123478/S167","Royal","B2/S","Seeds","B234/S","Serviettes","B367/S125678","Slow Blob","B3/S1237","SnowLife","B3678/S235678","Stains","B71/S1458726","Triangle Infinity","B5678/S45678","Vote","B4678/S35678","Vote 4/5","B45678/S2345","Walled cities","B84237156/S3182","Zelda"];
 
 //var lifeForm = shapes[0];
 var lifeForm = false;
@@ -734,6 +736,15 @@ function update(obj) {
       replaceRules(document.getElementById("ruleInput").value);
     }
   }
+  else if (obj.id === "compToggle") {
+    if (showColorComp) {
+      showColorComp = false;
+    }
+    else {
+      showColorComp = true;
+    }
+    updateRead();
+  }
 }
 
 function replaceColor(c1,c2) {
@@ -762,6 +773,10 @@ function getActiveCells(truth) {
 function updateRead() {
   var element = document.getElementById("readout");
   element.innerHTML = "<b>generations</b>: " + generations + ",  <b>active cells</b>: " + getActiveCells(true) + "/" + grid.length + " (<i>" + Math.floor(((getActiveCells(true) / grid.length) * 100) + 0.5) + "%</i>)";
+  if (showColorComp) {
+    var cA = getColorComp();
+    element.innerHTML = element.innerHTML + ", <b>color comp</b>: ("+"<span style='color:"+colorSet[0]+"'>"+cA[0]+"</span>, "+"<span style='color:"+colorSet[1]+"'>"+cA[1]+"</span>, "+"<span style='color:"+colorSet[2]+"'>"+cA[2]+"</span>, "+"<span style='color:"+colorSet[3]+"'>"+cA[3]+"</span>, "+"<span style='color:"+colorSet[4]+"'>"+cA[4]+"</span>, "+"<span style='color:"+colorSet[5]+"'>"+cA[5]+"</span>)";
+  }
 }
 
 function reGrid(num) {
@@ -1014,7 +1029,7 @@ function imageLoad(e) {
   newBlob();
 }
 
-function randomRule() {
+function randomRule(cutoff) {
   var chars = ["1","2","3","4","5","6","7","8"];
   var bNum = Math.floor(Math.random() * 8) + 1;
   var sNum = Math.floor(Math.random() * 8) + 1;
@@ -1032,4 +1047,90 @@ function randomRule() {
     chars.splice(test,1);
   }
   return ret;
+}
+
+function convertToNotes(truth) {
+  //truth = false; often creates more dense melodies
+  var startPoint;
+  for (var i = 0; i < grid.length; i++) {
+    if (grid[i] === 1) {
+      startPoint = i;
+      i = grid.length;
+    }
+  }
+  startPoint = startPoint + dimX + 1;
+  var startX = Math.floor(startPoint - (Math.floor(startPoint / dimX) * dimX) / 2);
+  var startY = Math.floor(Math.floor(startPoint / dimX) / 2);
+  var endY = Math.floor((dimY / 2) - startY);
+  var noteArray = [];
+  var a = startY;
+  for (var b = startX; b < (dimX / 2); b++) {
+    var temp = (a * 2 * dimX) + (b * 2);
+    if (truth) {
+      if (grid[temp] === 1) {
+        noteArray.push(getNeighbors(temp).length);
+      }
+      else {
+        noteArray.push(0);
+      }
+    }
+    else {
+      noteArray.push(getNeighbors(temp).length);
+    }
+  }
+  for (var a = (startY + 1); a < endY; a++) {
+    for (var b = 0; b < (dimX / 2); b++) {
+      var temp = (a * 2 * dimX) + (b * 2);
+      if (truth) {
+        if (grid[temp] === 1) {
+          noteArray.push(getNeighbors(temp).length);
+        }
+        else {
+          noteArray.push(0);
+        }
+      }
+      else {
+        noteArray.push(getNeighbors(temp).length);
+      }
+    }
+  }
+  return noteArray;
+}
+
+function playMusic(bpm,startPercent,truth) {
+  var notes = convertToNotes(truth);
+  var timeSplit = Math.floor(60000 / bpm);
+  var pos = Math.floor(notes.length * startPercent);
+  music = setInterval(function(){
+    if (pos === notes.length) {
+      clearInterval(music);
+    }
+    if (notes[pos] !== 0) {
+      var audioBox = document.getElementById(("sound" + notes[pos]));
+      audioBox.play();
+    }
+    pos++;
+  },timeSplit);
+}
+
+function getColorComp() {
+  var resArray = [];
+  for (var c = 0; c < colorSet.length; c++) {
+    resArray.push(0);
+  }
+  for (var i = 0; i < colors.length; i++) {
+    for (var c = 0; c < colorSet.length; c++) {
+      if (colors[i] === colorSet[c] && grid[i] === 1) {
+        resArray[c] = JSON.parse(resArray[c]) + 1;
+      }
+    }
+  }
+  var totalN = 0;
+  for (var i = 0; i < resArray.length; i++) {
+    totalN = totalN + resArray[i];
+  }
+  for (var i = 0; i < resArray.length; i++) {
+    resArray[i] = (Math.floor((resArray[i] / totalN) * 10000) / 100) + "%";
+  }
+  return resArray;
 }
