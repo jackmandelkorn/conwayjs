@@ -3,7 +3,7 @@
   <head>
     <title>Conway.js</title>
     <link rel="icon" href="favicon.ico" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="js/jquery.min.js"></script>
     <script src="js/fileSaver.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Bungee|Ubuntu" rel="stylesheet">
     <link rel="stylesheet" href="css/conway.css" />
@@ -107,14 +107,21 @@
       <form>
         <div style="text-align:center;"><b>Game Rules</b></div><br>
         presets <select id="presetSelect" onchange="update(this)">
-          <option value="">--</option>
+          <option value="" id="defaultOpt">--</option>
         </select><br><br>
-        rulestring <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" onchange="update(this)" spellcheck="false"/><br>
+        rulestring<sup style="color:red;">*</sup> <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" onchange="update(this)" spellcheck="false"/><br>
       </form><button id="randRule" class="mini" onclick="update(this)">random rule</button><br><br>
         auto-update <input id="warningToggle" type="checkbox"/><br><br>
       <div style="text-align:center;">
         <button id="editRule" onclick="update(this)">update rules</button>
       </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Fill Settings</b></div><br>
+        fill color <input id="fillCol" class="splotch" type="color" value="#FF0000" onchange="update(this)"/><br><br>
+        max iterations<sup style="color:red;">*</sup> <input id="fillMax" type="number" value="100" step="1" min="0" max="10000" onchange="update(this)"/><br><br>
+        click filling <input id="clickFill" type="checkbox" onchange="update(this)"/><br>
+      </form>
       <br><hr><br>
       <form style="color:gray;text-align:center;font-size:12px;">
         <span>Made by <a href="https://github.com/jackmandelkorn" target="_blank" style="color:#505050;">Jack Mandelkorn</a>.</span><br><br>

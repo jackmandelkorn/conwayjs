@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Conway.js</title>
+    <link rel="icon" href="favicon.ico" />
+    <script src="js/jquery.min.js"></script>
+    <script src="js/fileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Bungee|Ubuntu" rel="stylesheet">
+    <link rel="stylesheet" href="css/conwayPopup.css" />
+    <script src="js/keys.js"></script>
+    <style>
+      /*Onboard Style*/
+    </style>
+  </head>
+  <body class="un">
+    <canvas id="canvas" width="600" height="500"></canvas>
+    <div id="container">
+      <h1>conway<sub style="font-size:25px;">js</sub></h1>
+      <hr><br>
+      <div style="text-align: center;">
+        <form><b>Controls / General Settings</b></form><br>
+        <button id="playButton" style="margin: 3px;">▶</button>
+        <button id="pauseButton" style="margin: 3px;">❚❚</button>
+        <button id="stepButton" style="margin: 3px;">step</button>
+        <button id="rewindButton" style="margin: 3px;">rewind</button>
+      </div>
+      <br>
+      <form>
+        fps <input id="fpsInput" type="number" value="30" step="1" min="0" max="60"/><br><br>
+        rewind<sup style="color:red;font-size:8px;">BETA</sup> <input id="rewindToggle" type="checkbox"/><br>
+        autoplay <input id="stepToggle" type="checkbox" checked="true"/><br>
+        keyboard controls <input id="keyControls" type="checkbox" checked="true"/><br>
+        glowing edges <input id="glowToggle" type="checkbox"/><br>
+        grayscale <input id="grayscaleToggle" type="checkbox"/><br>
+        show world name <input id="worldNameToggle" type="checkbox"/><br>
+        show color composition <input id="compToggle" type="checkbox"/><br>
+      </form>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Dipslay Settings</b></div><br>
+        background color <input id="backgroundCol" class="splotch" value="#000000" type="color"/><br><br>
+        color set <input id="color1" class="colortile" style="margin-left: 5px;" type="color" value="#FF0000"/>
+        <input id="color2" class="colortile" type="color" value="#FFA500"/>
+        <input id="color3" class="colortile" type="color" value="#FFFF00"/><br>
+        <input id="color4" class="colortile" type="color" value="#008000"/>
+        <input id="color5" class="colortile" type="color" value="#0000FF"/>
+        <input id="color6" class="colortile" type="color" value="#800080"/><br><br>
+        glow radius <input id="glowRadius" type="number" value="25" step="0.5" min="5" max="80"/><br><br>
+        fuzz (<i>bit division</i>) <input id="blur" type="number" value="1" step="0.5" min="0.5" max="50"/>
+      </form>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>World Generator</b></div><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInput" type="number" value="2.5" step="0.5" min="0.5" max="20"/><br><br>
+        seed percentage<sup style="color:red;">*</sup> <input id="seedInput" type="number" value="50" step="0.5" min="0.5" max="99.5"/><br><br>
+        starting generation <input id="startGenInput" type="number" value="0" step="1" min="0" max="50"/><br><br>
+        world name <input id="nameInput" type="text" placeholder="Untitled 1" maxlength="50"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="newWorld">generate world</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Custom Object</b></div><br>
+        grid size<sup style="color:red;">*</sup> <input id="gridInput" type="number" value="7" step="1" min="2" max="20"/><br><br>
+        paint color <input id="paintCol" class="splotch" type="color" value="#FF0000"/><br><br>
+        <div id="gridContainer"></div><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom" type="number" value="2.5" step="0.5" min="0.5" max="20"/><br><br>
+        starting generation <input id="startGenInputCustom" type="number" value="0" step="1" min="0" max="50"/><br><br>
+        being name <input id="nameInputCustom" type="text" placeholder="Untitled 1" maxlength="50"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="newBeing">create object</button>
+      </div>
+      <br><hr><br>
+      <form style="text-align:center;">
+        <b>Upload Image</b><br><br>
+        <input id="imageUpload" type="file"/><br><br>
+        render height<sup style="color:red;">*</sup> <input id="renderHeight" type="number" value="100" step="1" min="5"/><br><br>
+        world scale<sup style="color:red;">*</sup> <input id="scaleInputCustom2" type="number" value="2.5" step="0.5" min="0.5" max="20"/><br><br>
+        sensitivity <input id="lightSensitivity" type="number" value="60" step="1" min="1" min="99"/><br><br>
+        invert <input id="colorInversionToggle" type="checkbox"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="imageButton">render image</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Export</b></div><br>
+        current generation <input id="currentToggle" type="checkbox" checked/><br><br>
+        file name<sup style="color:red;">*</sup> <input id="fileNameInput" type="text" placeholder="Untitled 0" maxlength="50"/><br><br>
+        .conwayjs <input id="conwayjsFileType" type="radio" name="fileSelect" checked/><br>
+        .txt <input id="txtFileType" type="radio" name="fileSelect"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="exportButton">export world</button>
+      </div>
+      <br><hr><br>
+      <form style="text-align:center;">
+        <b>Import</b><br><br>
+        <input id="fileImport" type="file"/><br><br>
+      </form>
+      <div style="text-align:center;">
+        <button id="importButton">load world</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Game Rules</b></div><br>
+        presets <select id="presetSelect">
+          <option value="" id="defaultOpt">--</option>
+        </select><br><br>
+        rulestring<sup style="color:red;">*</sup> <input id="ruleInput" type="text" placeholder="B3/S23" maxlength="50" spellcheck="false"/><br>
+      </form><button id="randRule" class="mini">random rule</button><br><br>
+        auto-update <input id="warningToggle" type="checkbox"/><br><br>
+      <div style="text-align:center;">
+        <button id="editRule">update rules</button>
+      </div>
+      <br><hr><br>
+      <form>
+        <div style="text-align:center;"><b>Fill Settings</b></div><br>
+        fill color <input id="fillCol" class="splotch" type="color" value="#FF0000"/><br><br>
+        max iterations<sup style="color:red;">*</sup> <input id="fillMax" type="number" value="100" step="1" min="0" max="10000"/><br><br>
+        click filling <input id="clickFill" type="checkbox"/><br>
+      </form>
+      <br><hr><br>
+      <form style="color:gray;text-align:center;font-size:12px;">
+        <span>Made by <a href="https://github.com/jackmandelkorn" target="_blank" style="color:#505050;">Jack Mandelkorn</a>.</span><br><br>
+        <span>More at the <a href="http://www.conwaylife.com/wiki/Main_Page" target="_blank" style="color:#505050;">Wiki</a>.</span><br><br>
+      </form>
+    </div>
+    <span id="version">v1.2.4</span>
+    <div id="readout"></div>
+    <div id="worldName">Untitled 0</div>
+    <script src="js/conwayPopup.js"></script>
+    <audio id="sound1" src="sounds/1.wav"></audio>
+    <audio id="sound2" src="sounds/2.wav"></audio>
+    <audio id="sound3" src="sounds/3.wav"></audio>
+    <audio id="sound4" src="sounds/4.wav"></audio>
+    <audio id="sound5" src="sounds/5.wav"></audio>
+    <audio id="sound6" src="sounds/6.wav"></audio>
+    <audio id="sound7" src="sounds/7.wav"></audio>
+    <audio id="sound8" src="sounds/8.wav"></audio>
+  </body>
+</html>

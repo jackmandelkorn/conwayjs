@@ -36,6 +36,17 @@ $("input[type=checkbox]").click(function(){
   $("input[type=checkbox]").blur();
 });
 
+//Extensions
+$("button").click(function(){
+  update(this);
+});
+$("input").change(function(){
+  update(this);
+});
+$("select").change(function(){
+  update(this);
+});
+
 onKey(65,function(){
   if (controls) {
     if (document.getElementById("stepToggle").checked) {
@@ -80,7 +91,7 @@ var ctx = canvas.getContext("2d");
 
 var shapes = [];
 
-var scale = 4;
+var scale = 2.5;
 var scaleInt = (scale / blur);
 var dimX = Math.floor(canvas.width / scaleInt);
 var dimY = Math.floor(canvas.height / scaleInt);
