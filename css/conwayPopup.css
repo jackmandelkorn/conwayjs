@@ -1,0 +1,212 @@
+body {
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  margin: 0;
+  background-color: #f0f0f0;
+  color: #0f0f0f;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 14px;
+}
+
+hr {
+  text-align: center;
+  width: 140px;
+  height: 1px;
+  background-color: #A0A0A0;
+  border: none;
+  cursor: default;
+}
+
+input[type=file] {
+  outline: none;
+  padding-left: 4px;
+  margin-left: 5px;
+  box-sizing: border-box;
+}
+
+input[type=text] {
+  outline: none;
+  width: 120px;
+  height: 25px;
+  text-align: left;
+  padding-left: 4px;
+  margin-left: 5px;
+  box-sizing: border-box;
+}
+input[type=number] {
+  outline: none;
+  width: 40px;
+  height: 25px;
+  text-align: center;
+  margin-left: 5px;
+  box-sizing: border-box;
+}
+input[type=color] {
+  outline: none;
+  width: 40px;
+  height: 25px;
+  margin-left: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+input[type=checkbox] {
+  outline: none;
+  cursor: pointer;
+}
+
+
+h1 {
+  font-family: 'Bungee', cursive;
+  font-size: 40px;
+  line-height: 40px;
+  text-align: center;
+  margin: 15px 0;
+  cursor: default;
+}
+
+form {
+  cursor: default;
+}
+
+#canvas {
+  width: calc(100vw - 305px);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  -webkit-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.7);
+  -moz-box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.7);
+  box-shadow: 0px 0px 35px 0px rgba(0,0,0,0.7);
+  box-sizing: border-box;
+}
+
+#container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 283px;
+  padding: 25px;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+input[type=color].colortile {
+  width: 20px;
+  height: 20px;
+  padding: 0 !important;
+  border: none;
+  margin: 0;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type=color].splotch {
+  width: 30px;
+  height: 20px;
+  padding: 0 !important;
+  border: none;
+  margin: 0;
+  background-color: #f0f0f0;
+  box-sizing: border-box;
+  outline: none;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+button.mini {
+  height: 15px;
+  font-size: 10px;
+}
+
+
+#readout {
+  position: fixed;
+  text-align: center;
+  padding: 5px;
+  bottom: 0;
+  left: 0;
+  background-color: #0f0f0f;
+  color: #D0D0D0;
+  opacity: 0.8;
+  z-index: 2;
+}
+
+.un {
+  -webkit-user-select: none; /* Chrome/Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+
+  /* Rules below not implemented in browsers yet */
+  -o-user-select: none;
+  user-select: none;
+}
+
+#worldName {
+  color: white;
+  opacity: 0.8;
+  position: fixed;
+  top: 20px;
+  font-size: 30px;
+  left: 0;
+  width: calc(100vw - 300px);
+  text-align: center;
+  z-index: 1;
+  display: none;
+  cursor: default;
+}
+
+.gridBlock {
+  background-color: #F0F0F0;
+  box-sizing: border-box;
+  margin: 1px;
+  float: left;
+  position: relative;
+  opacity: 1;
+}
+.gridBlock:hover {
+  opacity: 0.6;
+}
+
+.gridBlock-clicked {
+  background-color: #F0F0F0;
+  box-sizing: border-box;
+  margin: 1px;
+  float: left;
+  position: relative;
+  opacity: 1;
+}
+.gridBlock-clicked:hover {
+  opacity: 0.6;
+}
+
+#gridContainer {
+  width: 233px;
+  height: 233px;
+  background-color: gray;
+  padding: 1px;
+  box-sizing: border-box;
+}
+
+#version {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 10px;
+  cursor: default;
+}
+
+audio {
+  display: none;
+}
+
+
+/*Chrome Extension*/
+body, html {
+  width: 1000px;
+  height: 600px;
+}
